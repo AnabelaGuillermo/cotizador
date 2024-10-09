@@ -36,13 +36,26 @@ def search():
         precio_efectivo_formatted = "${:,.0f}".format(precio_efectivo).replace(',', '.')
         
         # Mostrar los resultados
-        result_label.config(text=f"{articulo} {precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01.")
+        result_text = f"{articulo} {precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01."
+        result_label.config(text=result_text)
     else:
         result_label.config(text="Artículo no encontrado.")
+
+# Función para copiar el texto al portapapeles
+def copy_to_clipboard():
+    result_text = result_label.cget("text")
+    if result_text:  # Solo copiar si hay texto
+        root.clipboard_clear()  # Limpiar el portapapeles
+        root.clipboard_append(result_text)  # Agregar el texto
+        root.update()  # Actualizar el portapapeles
 
 # Botón de búsqueda
 search_button = tk.Button(root, text="Buscar", command=search)
 search_button.grid(row=1, column=1, padx=10, pady=10)
+
+# Botón para copiar el texto
+copy_button = tk.Button(root, text="Copiar", command=copy_to_clipboard)
+copy_button.grid(row=3, column=2, padx=10, pady=10)
 
 # Iniciar la aplicación
 root.mainloop()
