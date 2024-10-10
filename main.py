@@ -63,7 +63,7 @@ for option in financing_options:
 def calculate_financing(precio_lista):
     results = []
     
-    # Mostrar todas las cuotas seleccionadas
+    # Mostrar todas las cuotas seleccionadas por tarjeta
     for option in financing_options:
         if checkbox_vars[option].get():
             if option == "VISA/MASTERCARD":
@@ -72,23 +72,27 @@ def calculate_financing(precio_lista):
                     financing_multiplier = data.loc[data['CODIGO'] == selected_codigo, f"VISA/MASTERCARD BANCO {cuotas}"].values[0]
                     cuota = (precio_lista * financing_multiplier) / int(cuotas.split()[0])
                     results.append(f"  {cuotas} de ${cuota:.2f}")
+                results.append("")  # Agregar una línea en blanco después de VISA/MASTERCARD
             elif option == "NARANJA":
                 results.append("NARANJA:")
                 for cuotas in ["PLAN Z 3 CUOTAS", "6 CUOTAS", "10 CUOTAS", "12 CUOTAS", "18 CUOTAS"]:
                     financing_multiplier = data.loc[data['CODIGO'] == selected_codigo, f"NARANJA {cuotas}"].values[0]
                     cuota = (precio_lista * financing_multiplier) / int(cuotas.split()[-2])
                     results.append(f"  {cuotas} de ${cuota:.2f}")
+                results.append("")  # Agregar una línea en blanco después de NARANJA
             elif option == "SUCREDITO":
                 results.append("SUCREDITO:")
                 for cuotas in ["3 CUOTAS", "6 CUOTAS", "12 CUOTAS"]:
                     financing_multiplier = data.loc[data['CODIGO'] == selected_codigo, f"SUCREDITO {cuotas}"].values[0]
                     cuota = (precio_lista * financing_multiplier) / int(cuotas.split()[0])
                     results.append(f"  {cuotas} de ${cuota:.2f}")
+                results.append("")  # Agregar una línea en blanco después de SUCREDITO
             elif option == "SOL":
                 results.append("SOL:")
                 financing_multiplier = data.loc[data['CODIGO'] == selected_codigo, "SOL 12 CUOTAS"].values[0]
                 cuota = (precio_lista * financing_multiplier) / 12
                 results.append(f"  12 CUOTAS de ${cuota:.2f}")
+                results.append("")  # Agregar una línea en blanco después de SOL
     
     return results
 
@@ -112,12 +116,12 @@ def show_selected(event):
             # Formatear el precio con separador de miles como punto
             precio_efectivo_formatted = "${:,.0f}".format(precio_efectivo).replace(',', '.')
             
-            # Mostrar los resultados
-            result_text = f"{articulo} {precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01."
+            # Mostrar los resultados con un salto de línea después del artículo y precio efectivo
+            result_text = f"{articulo} {precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01.\n\n"
             
             # Calcular y mostrar las opciones de financiación
             financing_results = calculate_financing(precio_lista)
-            result_label.config(text=result_text + "\n" + "\n".join(financing_results))
+            result_label.config(text=result_text + "\n".join(financing_results))
 
 # Función para actualizar la búsqueda en tiempo real
 def search(event):
