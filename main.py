@@ -3,12 +3,15 @@ import tkinter as tk
 from tkinter import ttk
 
 # Leer el archivo XLS
-file_path = r'C:\Users\User\Desktop\App.xlsx'  # Ruta a tu archivo
+file_path = r'C:\Users\User\Desktop\App.xlsx'
 data = pd.read_excel(file_path)
 
 # Crear la ventana principal
 root = tk.Tk()
 root.title('Cotizador Aspen')
+
+# Ajustar el tamaño de la ventana (ancho x alto)
+root.geometry("600x400")
 
 # Etiqueta de búsqueda
 search_label = tk.Label(root, text="Buscar por Código o Artículo")
@@ -18,28 +21,53 @@ search_label.grid(row=0, column=0, padx=10, pady=10)
 search_entry = tk.Entry(root)
 search_entry.grid(row=0, column=1, padx=10, pady=10)
 
-# Etiquetas para mostrar los resultados
-result_label = tk.Label(root, text="", fg="blue")
+# Listbox para mostrar las opciones de búsqueda
+listbox = tk.Listbox(root, height=4, width=70, selectmode=tk.SINGLE)
+listbox.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+
+# Etiqueta para mostrar los resultados seleccionados
+result_label = tk.Label(root, text="", fg="blue", wraplength=500)
 result_label.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
 
-# Función que se ejecutará al hacer clic en el botón de búsqueda
-def search():
+# Función para actualizar la búsqueda en tiempo real
+def search(event):
     search_text = search_entry.get()
-    result = data[(data['CODIGO'] == search_text) | (data['ARTICULO'].str.contains(search_text, case=False, na=False))]
+    result = data[(data['CODIGO'].astype(str).str.contains(search_text, case=False, na=False)) | 
+                  (data['ARTICULO'].str.contains(search_text, case=False, na=False))]
+    
+    # Limpiar la lista actual de resultados
+    listbox.delete(0, tk.END)
     
     if not result.empty:
-        # Extraer los datos necesarios
-        articulo = result.iloc[0]['ARTICULO']
-        precio_efectivo = result.iloc[0]['PRECIO EFECTIVO']
-        
-        # Formatear el precio con separador de miles como punto
-        precio_efectivo_formatted = "${:,.0f}".format(precio_efectivo).replace(',', '.')
-        
-        # Mostrar los resultados
-        result_text = f"{articulo} {precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01."
-        result_label.config(text=result_text)
+        for index, row in result.iterrows():
+            articulo = row['ARTICULO']
+            codigo = row['CODIGO']
+            # Mostrar "Código - Artículo" en el listbox
+            listbox.insert(tk.END, f"{codigo} - {articulo}")
     else:
-        result_label.config(text="Artículo no encontrado.")
+        listbox.insert(tk.END, "Artículo no encontrado.")
+
+# Función para mostrar los detalles del artículo seleccionado
+def show_selected(event):
+    selected_index = listbox.curselection()  # Obtener el índice del elemento seleccionado
+    if selected_index:
+        selected_item = listbox.get(selected_index)  # Obtener el texto del artículo seleccionado
+        codigo = selected_item.split(' - ')[0]  # Extraer el código del artículo
+        
+        # Buscar el artículo seleccionado en los datos originales
+        result = data[data['CODIGO'].astype(str) == codigo]
+        
+        if not result.empty:
+            # Extraer los datos necesarios
+            articulo = result.iloc[0]['ARTICULO']
+            precio_efectivo = result.iloc[0]['PRECIO EFECTIVO']
+            
+            # Formatear el precio con separador de miles como punto
+            precio_efectivo_formatted = "${:,.0f}".format(precio_efectivo).replace(',', '.')
+            
+            # Mostrar los resultados
+            result_text = f"{articulo} {precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01."
+            result_label.config(text=result_text)
 
 # Función para copiar el texto al portapapeles
 def copy_to_clipboard():
@@ -49,9 +77,11 @@ def copy_to_clipboard():
         root.clipboard_append(result_text)  # Agregar el texto
         root.update()  # Actualizar el portapapeles
 
-# Botón de búsqueda
-search_button = tk.Button(root, text="Buscar", command=search)
-search_button.grid(row=1, column=1, padx=10, pady=10)
+# Vincular la función de búsqueda con el evento de liberación de tecla
+search_entry.bind('<KeyRelease>', search)
+
+# Vincular la selección del Listbox para mostrar detalles del artículo
+listbox.bind('<<ListboxSelect>>', show_selected)
 
 # Botón para copiar el texto
 copy_button = tk.Button(root, text="Copiar", command=copy_to_clipboard)
