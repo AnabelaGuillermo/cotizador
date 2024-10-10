@@ -26,9 +26,21 @@ search_label.grid(row=0, column=0, padx=10, pady=10, sticky='ew')
 search_entry = tk.Entry(root)
 search_entry.grid(row=0, column=1, padx=10, pady=10, sticky='ew')
 
+# Crear un frame para contener el Listbox y el Scrollbar
+listbox_frame = tk.Frame(root)
+listbox_frame.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
+
 # Listbox para mostrar las opciones de búsqueda
-listbox = tk.Listbox(root, height=4, width=70, selectmode=tk.SINGLE)
-listbox.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
+listbox = tk.Listbox(listbox_frame, height=4, width=70, selectmode=tk.SINGLE)
+listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+# Scrollbar para el Listbox
+scrollbar = tk.Scrollbar(listbox_frame, orient=tk.VERTICAL)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+# Vincular el Scrollbar al Listbox
+listbox.config(yscrollcommand=scrollbar.set)
+scrollbar.config(command=listbox.yview)
 
 # Etiqueta para mostrar los resultados seleccionados
 result_label = tk.Label(root, text="", fg="blue", wraplength=500)
