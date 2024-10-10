@@ -46,6 +46,13 @@ scrollbar.config(command=listbox.yview)
 result_label = tk.Label(root, text="", fg="blue", wraplength=500)
 result_label.grid(row=3, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
 
+# Etiqueta y campo para el anticipo
+anticipo_label = tk.Label(root, text="Anticipo:")
+anticipo_label.grid(row=2, column=0, padx=10, pady=10, sticky='w')
+
+anticipo_entry = tk.Entry(root)
+anticipo_entry.grid(row=2, column=1, padx=10, pady=10, sticky='ew')
+
 # Funciones para las opciones de financiación
 financing_options = ["VISA/MASTERCARD", "NARANJA", "SUCREDITO", "SOL"]
 
@@ -55,13 +62,17 @@ row_index = 4
 for option in financing_options:
     var = tk.BooleanVar()
     checkbox_vars[option] = var
-    checkbox = tk.Checkbutton(root, text=option, variable=var, command=lambda: show_selected(None))
+    checkbox = tk.Checkbutton(root, text=option, variable=var, command=lambda: update_results())
     checkbox.grid(row=row_index, column=0, padx=10, sticky='w')
     row_index += 1
 
-# Función para calcular los precios de las cuotas
-def calculate_financing(precio_lista):
+# Función para calcular los precios de las cuotas con anticipo
+def calculate_financing(precio_lista, anticipo):
     results = []
+    precio_lista -= anticipo  # Restar el anticipo al precio de lista
+    
+    # Asegurarse de que el precio sea al menos 0
+    precio_lista = max(0, precio_lista)
     
     # Mostrar todas las cuotas seleccionadas por tarjeta
     for option in financing_options:
@@ -119,9 +130,20 @@ def show_selected(event):
             # Mostrar los resultados con un salto de línea después del artículo y precio efectivo
             result_text = f"{articulo} {precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01.\n\n"
             
-            # Calcular y mostrar las opciones de financiación
-            financing_results = calculate_financing(precio_lista)
-            result_label.config(text=result_text + "\n".join(financing_results))
+            result_label.config(text=result_text)
+            update_results()  # Llamar a la función de actualización de resultados
+
+# Función para actualizar los resultados de cuotas cuando cambia el anticipo
+def update_results():
+    anticipo = anticipo_entry.get()
+    anticipo = float(anticipo) if anticipo else 0
+    result = data[data['CODIGO'].astype(str) == selected_codigo]
+    if not result.empty:
+        precio_lista = result.iloc[0]['PRECIO LISTA']
+        financing_results = calculate_financing(precio_lista, anticipo)
+        
+        # Actualiza el texto del result_label en lugar de agregar más texto
+        result_label.config(text=result_label.cget("text").split("\n\n")[0] + "\n\n" + "\n".join(financing_results))
 
 # Función para actualizar la búsqueda en tiempo real
 def search(event):
@@ -149,24 +171,21 @@ def search(event):
 # Función para copiar el texto al portapapeles
 def copy_to_clipboard():
     result_text = result_label.cget("text")
-    if result_text:  # Solo copiar si hay texto
-        root.clipboard_clear()  # Limpiar el portapapeles
-        root.clipboard_append(result_text)  # Agregar el texto
-        root.update()  # Actualizar el portapapeles
+    root.clipboard_clear()
+    root.clipboard_append(result_text)
 
-# Vincular la función de búsqueda con el evento de liberación de tecla
-search_entry.bind('<KeyRelease>', search)
+# Vincular la búsqueda con el evento KeyRelease
+search_entry.bind("<KeyRelease>", search)
 
-# Vincular la selección del Listbox para mostrar detalles del artículo
+# Vincular la selección del Listbox con la función show_selected
 listbox.bind('<<ListboxSelect>>', show_selected)
 
-# Botón para copiar el texto
-copy_button = tk.Button(root, text="Copiar", command=copy_to_clipboard)
-copy_button.grid(row=row_index, column=0, padx=10, pady=10, sticky='ew')
+# Vincular la entrada del anticipo con la función de actualización de resultados
+anticipo_entry.bind("<KeyRelease>", lambda event: update_results())
 
-# Mostrar mensaje inicial al cargar la ventana
-listbox.insert(tk.END, "Indica arriba la moto por la que consultas.")
-listbox.itemconfig(0, {'fg': 'light grey'})  # Color gris claro
+# Botón para copiar al portapapeles
+copy_button = tk.Button(root, text="Copiar información", command=copy_to_clipboard)
+copy_button.grid(row=row_index, column=0, padx=10, pady=10, sticky='w')
 
-# Iniciar la aplicación
+# Ejecutar el bucle principal de la ventana
 root.mainloop()
