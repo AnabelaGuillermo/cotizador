@@ -13,21 +13,26 @@ root.title('Cotizador Aspen')
 # Ajustar el tamaño de la ventana (ancho x alto)
 root.geometry("600x400")
 
+# Configurar las columnas para que se expandan
+root.grid_columnconfigure(0, weight=1)
+root.grid_columnconfigure(1, weight=1)
+root.grid_columnconfigure(2, weight=1)
+
 # Etiqueta de búsqueda
 search_label = tk.Label(root, text="Buscar por Código o Artículo")
-search_label.grid(row=0, column=0, padx=10, pady=10)
+search_label.grid(row=0, column=0, padx=10, pady=10, sticky='ew')
 
 # Campo de entrada para la búsqueda
 search_entry = tk.Entry(root)
-search_entry.grid(row=0, column=1, padx=10, pady=10)
+search_entry.grid(row=0, column=1, padx=10, pady=10, sticky='ew')
 
 # Listbox para mostrar las opciones de búsqueda
 listbox = tk.Listbox(root, height=4, width=70, selectmode=tk.SINGLE)
-listbox.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+listbox.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
 
 # Etiqueta para mostrar los resultados seleccionados
 result_label = tk.Label(root, text="", fg="blue", wraplength=500)
-result_label.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
+result_label.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky='ew')
 
 # Función para actualizar la búsqueda en tiempo real
 def search(event):
@@ -85,7 +90,7 @@ listbox.bind('<<ListboxSelect>>', show_selected)
 
 # Botón para copiar el texto
 copy_button = tk.Button(root, text="Copiar", command=copy_to_clipboard)
-copy_button.grid(row=3, column=2, padx=10, pady=10)
+copy_button.grid(row=3, column=2, padx=10, pady=10, sticky='ew')
 
 # Iniciar la aplicación
 root.mainloop()
