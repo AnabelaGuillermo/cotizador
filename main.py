@@ -37,20 +37,25 @@ result_label.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky='ew')
 # Función para actualizar la búsqueda en tiempo real
 def search(event):
     search_text = search_entry.get()
-    result = data[(data['CODIGO'].astype(str).str.contains(search_text, case=False, na=False)) | 
-                  (data['ARTICULO'].str.contains(search_text, case=False, na=False))]
     
     # Limpiar la lista actual de resultados
     listbox.delete(0, tk.END)
     
-    if not result.empty:
-        for index, row in result.iterrows():
-            articulo = row['ARTICULO']
-            codigo = row['CODIGO']
-            # Mostrar "Código - Artículo" en el listbox
-            listbox.insert(tk.END, f"{codigo} - {articulo}")
+    if not search_text.strip():  # Si el campo de búsqueda está vacío
+        listbox.insert(tk.END, "Indica arriba la moto por la que consultas.")
+        listbox.itemconfig(0, {'fg': 'light grey'})  # Color gris claro
     else:
-        listbox.insert(tk.END, "Artículo no encontrado.")
+        result = data[(data['CODIGO'].astype(str).str.contains(search_text, case=False, na=False)) | 
+                      (data['ARTICULO'].str.contains(search_text, case=False, na=False))]
+        
+        if not result.empty:
+            for index, row in result.iterrows():
+                articulo = row['ARTICULO']
+                codigo = row['CODIGO']
+                # Mostrar "Código - Artículo" en el listbox
+                listbox.insert(tk.END, f"{codigo} - {articulo}")
+        else:
+            listbox.insert(tk.END, "Artículo no encontrado.")
 
 # Función para mostrar los detalles del artículo seleccionado
 def show_selected(event):
@@ -91,6 +96,10 @@ listbox.bind('<<ListboxSelect>>', show_selected)
 # Botón para copiar el texto
 copy_button = tk.Button(root, text="Copiar", command=copy_to_clipboard)
 copy_button.grid(row=3, column=2, padx=10, pady=10, sticky='ew')
+
+# Mostrar mensaje inicial al cargar la ventana
+listbox.insert(tk.END, "Indica arriba la moto por la que consultas.")
+listbox.itemconfig(0, {'fg': 'light grey'})  # Color gris claro
 
 # Iniciar la aplicación
 root.mainloop()
