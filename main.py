@@ -170,6 +170,10 @@ def update_results():
             result_text.insert(tk.END, "\n".join(financing_results))
 
 def search(event):
+    global data
+    # Recargar el archivo Excel en cada búsqueda
+    data = pd.read_excel(file_path)
+
     search_text = search_entry.get()
     listbox.delete(0, tk.END)
     
