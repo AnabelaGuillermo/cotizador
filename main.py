@@ -1,9 +1,30 @@
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk
+from tkinter import simpledialog
+import os
 
-# Leer el archivo XLS
-file_path = r'C:\Users\User\Desktop\App.xlsx'
+# Función para leer la ruta del archivo desde un archivo de configuración
+def read_file_path():
+    if os.path.exists('config.txt'):
+        with open('config.txt', 'r') as file:
+            return file.read().strip()
+    return ''
+
+# Función para guardar la ruta del archivo en un archivo de configuración
+def save_file_path(file_path):
+    with open('config.txt', 'w') as file:
+        file.write(file_path)
+
+# Leer la ruta del archivo desde el archivo de configuración
+file_path = read_file_path()
+
+# Si no hay una ruta guardada, pedir al usuario que la seleccione
+if not file_path:
+    file_path = simpledialog.askstring("Ruta del archivo", "Introduce la ruta del archivo Excel:", initialvalue=r'C:\Users\User\Desktop\App.xlsx')
+    if file_path:
+        save_file_path(file_path)
+
 data = pd.read_excel(file_path)
 
 # Crear la ventana principal
