@@ -87,6 +87,9 @@ for option in financing_options:
     checkbox.grid(row=row_index, column=0, padx=10, sticky='w')
     row_index += 1
 
+def format_currency(value):
+    return "{:,.0f}".format(value).replace(',', 'X').replace('.', ',').replace('X', '.')
+
 def calculate_financing(precio_lista, anticipo):
     results = []
     precio_lista -= anticipo
@@ -98,28 +101,28 @@ def calculate_financing(precio_lista, anticipo):
                 results.append("VISA/MASTERCARD:")
                 for cuotas in ["3 CUOTAS", "6 CUOTAS", "12 CUOTAS"]:
                     financing_multiplier = data.loc[data['CODIGO'] == selected_codigo, f"VISA/MASTERCARD BANCO {cuotas}"].values[0]
-                    cuota = (precio_lista * financing_multiplier) / int(cuotas.split()[0])
-                    results.append(f"  {cuotas} de ${cuota:.2f}")
+                    cuota = round((precio_lista * financing_multiplier) / int(cuotas.split()[0]))
+                    results.append(f"  {cuotas} de ${format_currency(cuota)}")
                 results.append("")
             elif option == "NARANJA":
                 results.append("NARANJA:")
                 for cuotas in ["PLAN Z 3 CUOTAS", "6 CUOTAS", "10 CUOTAS", "12 CUOTAS", "18 CUOTAS"]:
                     financing_multiplier = data.loc[data['CODIGO'] == selected_codigo, f"NARANJA {cuotas}"].values[0]
-                    cuota = (precio_lista * financing_multiplier) / int(cuotas.split()[-2])
-                    results.append(f"  {cuotas} de ${cuota:.2f}")
+                    cuota = round((precio_lista * financing_multiplier) / int(cuotas.split()[-2]))
+                    results.append(f"  {cuotas} de ${format_currency(cuota)}")
                 results.append("")
             elif option == "SUCREDITO":
                 results.append("SUCREDITO:")
                 for cuotas in ["3 CUOTAS", "6 CUOTAS", "12 CUOTAS"]:
                     financing_multiplier = data.loc[data['CODIGO'] == selected_codigo, f"SUCREDITO {cuotas}"].values[0]
-                    cuota = (precio_lista * financing_multiplier) / int(cuotas.split()[0])
-                    results.append(f"  {cuotas} de ${cuota:.2f}")
+                    cuota = round((precio_lista * financing_multiplier) / int(cuotas.split()[0]))
+                    results.append(f"  {cuotas} de ${format_currency(cuota)}")
                 results.append("")
             elif option == "SOL":
                 results.append("SOL:")
                 financing_multiplier = data.loc[data['CODIGO'] == selected_codigo, "SOL 12 CUOTAS"].values[0]
-                cuota = (precio_lista * financing_multiplier) / 12
-                results.append(f"  12 CUOTAS de ${cuota:.2f}")
+                cuota = round((precio_lista * financing_multiplier) / 12)
+                results.append(f"  12 CUOTAS de ${format_currency(cuota)}")
                 results.append("")
     
     return results
@@ -137,31 +140,29 @@ def show_selected(event):
             precio_efectivo = result.iloc[0]['PRECIO EFECTIVO']
             precio_lista = result.iloc[0]['PRECIO LISTA']
             precio_efectivo_formatted = "${:,.0f}".format(precio_efectivo).replace(',', '.')
-            result_text_content = f"{articulo} {precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01.\n\n"
+            result_text_content = f"{articulo} ${precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01.\n\n"
             result_text.delete(1.0, tk.END)
             result_text.insert(tk.END, result_text_content)
             update_results()
 
 def update_results():
     anticipo = anticipo_entry.get()
-    anticipo = float(anticipo) if anticipo else 0
+    anticipo = round(float(anticipo)) if anticipo else 0
     result = data[data['CODIGO'].astype(str) == selected_codigo]
     
     if not result.empty:
         precio_lista = result.iloc[0]['PRECIO LISTA']
         articulo = result.iloc[0]['ARTICULO']
         precio_efectivo = result.iloc[0]['PRECIO EFECTIVO']
-        precio_efectivo_formatted = "${:,.0f}".format(precio_efectivo).replace(',', '.')
+        precio_efectivo_formatted = format_currency(round(precio_efectivo))
 
-        # Comenzar a construir el contenido del Text
-        result_text_content = f"{articulo} {precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01.\n\n"
+        result_text_content = f"{articulo} ${precio_efectivo_formatted} precio contado efectivo. Casco + Formulario 01.\n\n"
         
         if anticipo > 0:
-            result_text_content += f"Anticipo de ${anticipo:.2f} +\n\n"
+            result_text_content += f"Anticipo de ${format_currency(anticipo)} +\n\n"
 
         financing_results = calculate_financing(precio_lista, anticipo)
 
-        # Limpiar el Text y mostrar resultados de financiación
         result_text.delete(1.0, tk.END)
         result_text.insert(tk.END, result_text_content)
         
