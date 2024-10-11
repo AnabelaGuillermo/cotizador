@@ -48,17 +48,26 @@ root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=1)
 root.grid_columnconfigure(2, weight=1)
 
+# Cargar y redimensionar la imagen
+logo_image = Image.open('assets/logoAspenCotizador.png')
+logo_image = logo_image.resize((120, 80), Image.LANCZOS)
+logo_photo = ImageTk.PhotoImage(logo_image)
+
+# Crear un label para la imagen y centrarlo
+logo_label = tk.Label(root, image=logo_photo)
+logo_label.grid(row=0, column=0, columnspan=3, padx=10, pady=(10, 5), sticky='n')
+
 # Etiqueta de búsqueda
 search_label = tk.Label(root, text="Buscar por Código o Artículo")
-search_label.grid(row=0, column=0, padx=10, pady=10, sticky='ew')
+search_label.grid(row=1, column=0, padx=10, pady=10, sticky='ew')
 
 # Campo de entrada para la búsqueda
 search_entry = tk.Entry(root)
-search_entry.grid(row=0, column=1, padx=10, pady=10, sticky='ew')
+search_entry.grid(row=1, column=1, padx=10, pady=10, sticky='ew')
 
 # Crear un frame para contener el Listbox y el Scrollbar
 listbox_frame = tk.Frame(root)
-listbox_frame.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
+listbox_frame.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
 
 # Listbox para mostrar las opciones de búsqueda
 listbox = tk.Listbox(listbox_frame, height=4, width=70, selectmode=tk.SINGLE)
@@ -78,17 +87,17 @@ result_label.grid(row=3, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
 
 # Etiqueta y campo para el anticipo
 anticipo_label = tk.Label(root, text="Anticipo:")
-anticipo_label.grid(row=2, column=0, padx=10, pady=10, sticky='w')
+anticipo_label.grid(row=4, column=0, padx=10, pady=10, sticky='w')
 
 anticipo_entry = tk.Entry(root)
-anticipo_entry.grid(row=2, column=1, padx=10, pady=10, sticky='ew')
+anticipo_entry.grid(row=4, column=1, padx=10, pady=10, sticky='ew')
 
 # Funciones para las opciones de financiación
 financing_options = ["VISA/MASTERCARD", "NARANJA", "SUCREDITO", "SOL"]
 
 # Crear checkboxes para las opciones de financiación
 checkbox_vars = {}
-row_index = 4
+row_index = 5  # Comenzar en la fila 5 para las opciones de financiación
 for option in financing_options:
     var = tk.BooleanVar()
     checkbox_vars[option] = var
