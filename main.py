@@ -2,6 +2,7 @@ import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 from tkinter import simpledialog
+from PIL import Image, ImageTk
 import os
 
 # Función para leer la ruta del archivo desde un archivo de configuración
@@ -33,6 +34,14 @@ root.title('Cotizador Aspen')
 
 # Ajustar el tamaño de la ventana (ancho x alto)
 root.geometry("800x600")
+
+# Cargar la imagen del favicon
+favicon_image = Image.open('assets/logoAspenCotizador.png')
+favicon_image = favicon_image.resize((32, 32), Image.LANCZOS)
+favicon_photo = ImageTk.PhotoImage(favicon_image)
+
+# Agregar el favicon a la ventana
+root.iconphoto(False, favicon_photo)
 
 # Configurar las columnas para que se expandan
 root.grid_columnconfigure(0, weight=1)
