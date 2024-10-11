@@ -1,14 +1,16 @@
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk
-from tkinter import simpledialog
+from tkinter import simpledialog, filedialog, messagebox
 from PIL import Image, ImageTk
 import os
 
 def read_file_path():
     if os.path.exists('config.txt'):
         with open('config.txt', 'r') as file:
-            return file.read().strip()
+            file_path = file.read().strip()
+            if os.path.exists(file_path):
+                return file_path
     return ''
 
 def save_file_path(file_path):
@@ -17,9 +19,16 @@ def save_file_path(file_path):
 
 file_path = read_file_path()
 if not file_path:
-    file_path = simpledialog.askstring("Ruta del archivo", "Introduce la ruta del archivo Excel:", initialvalue=r'C:\Users\User\Desktop\App.xlsx')
+    file_path = filedialog.askopenfilename(
+        title="Selecciona el archivo Excel",
+        filetypes=[("Excel files", "*.xlsx")],
+        initialdir=os.path.expanduser('~')
+    )
     if file_path:
         save_file_path(file_path)
+    else:
+        messagebox.showerror("Error", "No se seleccionó ningún archivo. Cerrando la aplicación.")
+        exit()
 
 data = pd.read_excel(file_path)
 
