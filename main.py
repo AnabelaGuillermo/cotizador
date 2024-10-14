@@ -35,16 +35,14 @@ root = tk.Tk()
 root.title('Cotizador Aspen')
 root.geometry("800x600")
 
-# Usa PhotoImage de Tkinter en lugar de Pillow
-favicon_photo = tk.PhotoImage(file='assets/logoAspenCotizador.png').subsample(2, 2)  # Redimensiona si es necesario
+favicon_photo = tk.PhotoImage(file='assets/logoAspenCotizador.png').subsample(2, 2)
 root.iconphoto(False, favicon_photo)
 
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=1)
 root.grid_columnconfigure(2, weight=1)
 
-# Redimensiona la imagen y usa PhotoImage
-logo_photo = tk.PhotoImage(file='assets/logoAspenCotizador.png').subsample(9, 9)  # Ajusta la escala según sea necesario
+logo_photo = tk.PhotoImage(file='assets/logoAspenCotizador.png').subsample(9, 9)
 logo_label = tk.Label(root, image=logo_photo)
 logo_label.grid(row=0, column=0, columnspan=3, padx=10, pady=(10, 5), sticky='n')
 
@@ -65,7 +63,6 @@ scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 listbox.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=listbox.yview)
 
-# Cambiado el result_label por un Text
 result_frame = tk.Frame(root)
 result_frame.grid(row=3, column=0, columnspan=3, padx=10, pady=10, sticky='ew')
 
@@ -82,7 +79,7 @@ anticipo_label.grid(row=4, column=0, padx=10, pady=10, sticky='w')
 anticipo_entry = tk.Entry(root)
 anticipo_entry.grid(row=4, column=1, padx=10, pady=10, sticky='ew')
 
-financing_options = ["VISA/MASTERCARD", "NARANJA", "SUCREDITO", "SOL"]
+financing_options = ["VISA/MASTERCARD BANCARIZADA", "NARANJA", "SUCREDITO", "SOL"]
 
 checkbox_vars = {}
 row_index = 5
@@ -103,8 +100,8 @@ def calculate_financing(precio_lista, anticipo):
     
     for option in financing_options:
         if checkbox_vars[option].get():
-            if option == "VISA/MASTERCARD":
-                results.append("VISA/MASTERCARD:")
+            if option == "VISA/MASTERCARD BANCARIZADA":
+                results.append("VISA/MASTERCARD BANCARIZADA:")
                 for cuotas in ["3 CUOTAS", "6 CUOTAS", "12 CUOTAS"]:
                     financing_multiplier = data.loc[data['CODIGO'] == selected_codigo, f"VISA/MASTERCARD BANCO {cuotas}"].values[0]
                     cuota = round((precio_lista * financing_multiplier) / int(cuotas.split()[0]))
@@ -177,7 +174,6 @@ def update_results():
 
 def search(event):
     global data
-    # Recargar el archivo Excel en cada búsqueda
     data = pd.read_excel(file_path)
 
     search_text = search_entry.get()
