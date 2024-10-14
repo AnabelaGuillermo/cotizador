@@ -2,7 +2,6 @@ import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 from tkinter import simpledialog, filedialog, messagebox
-from PIL import Image, ImageTk
 import os
 
 def read_file_path():
@@ -36,18 +35,16 @@ root = tk.Tk()
 root.title('Cotizador Aspen')
 root.geometry("800x600")
 
-favicon_image = Image.open('assets/logoAspenCotizador.png')
-favicon_image = favicon_image.resize((32, 32), Image.LANCZOS)
-favicon_photo = ImageTk.PhotoImage(favicon_image)
+# Usa PhotoImage de Tkinter en lugar de Pillow
+favicon_photo = tk.PhotoImage(file='assets/logoAspenCotizador.png').subsample(2, 2)  # Redimensiona si es necesario
 root.iconphoto(False, favicon_photo)
 
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=1)
 root.grid_columnconfigure(2, weight=1)
 
-logo_image = Image.open('assets/logoAspenCotizador.png')
-logo_image = logo_image.resize((120, 80), Image.LANCZOS)
-logo_photo = ImageTk.PhotoImage(logo_image)
+# Redimensiona la imagen y usa PhotoImage
+logo_photo = tk.PhotoImage(file='assets/logoAspenCotizador.png').subsample(9, 9)  # Ajusta la escala según sea necesario
 logo_label = tk.Label(root, image=logo_photo)
 logo_label.grid(row=0, column=0, columnspan=3, padx=10, pady=(10, 5), sticky='n')
 
